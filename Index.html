@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Gerador de Sensi PRO</title>
+
+<style>
+body{
+    background:#0f0f0f;
+    color:white;
+    font-family:Arial;
+    text-align:center;
+}
+.box{
+    background:#1c1c1c;
+    padding:20px;
+    margin:20px auto;
+    width:90%;
+    max-width:400px;
+    border-radius:15px;
+}
+button{
+    padding:10px 20px;
+    border:none;
+    border-radius:10px;
+    background:#00ff88;
+    cursor:pointer;
+    font-weight:bold;
+}
+input{
+    padding:8px;
+    border-radius:8px;
+    border:none;
+    margin:5px;
+}
+.admin{
+    display:none;
+}
+.limit{
+    color:#ff4444;
+    font-weight:bold;
+}
+</style>
+</head>
+<body>
+
+<h1 id="titulo">GERADOR DE SENSI 🔥</h1>
+<p>by darllyssom sensi</p>
+
+<div class="box">
+<h2>🎮 Área Grátis</h2>
+<p class="limit">Limite restante: <span id="limite">20</span></p>
+<button onclick="gerarGratis()">Gerar Sensi</button>
+<p id="resultado"></p>
+
+<input type="text" id="codigoExtra" placeholder="Código +20">
+<button onclick="usarCodigoExtra()">Usar Código</button>
+</div>
+
+<div class="box">
+<h2>💎 Área VIP</h2>
+<input type="text" id="loginVip" placeholder="Usuário">
+<input type="password" id="senhaVip" placeholder="Senha">
+<button onclick="loginVIP()">Entrar VIP</button>
+<p id="vipResultado"></p>
+</div>
+
+<div class="box admin" id="adminPanel">
+<h2>👑 Painel Admin</h2>
+<input type="password" id="senhaAdmin" placeholder="Senha Admin">
+<button onclick="loginAdmin()">Entrar</button>
+
+<div id="adminArea" style="display:none;">
+
+<h3>Gerar Código +20</h3>
+<button onclick="gerarCodigo()">Gerar Código</button>
+<p id="codigoGerado"></p>
+
+<hr>
+
+<h3>Gerar Usuário VIP</h3>
+<button onclick="gerarVip()">Gerar VIP</button>
+<p id="vipGerado"></p>
+
+</div>
+</div>
+
+<script>
+
+// ===== SENHAS =====
+const ADMIN_SENHA = "DarllyADM440";
+const PROMO_CODIGO = "PROMO10";
+
+// ===== VARIÁVEIS =====
+let limiteGratis = 20;
+let contadorSensi = 0;
+let codigoValido = "";
+let codigoExpira = 0;
+let vipUser = "";
+let vipPass = "";
+let promoExpira = 0;
+
+// ===== SALVAR / CARREGAR =====
+function carregarDados(){
+    limiteGratis = parseInt(localStorage.getItem("limite")) || 20;
+    contadorSensi = parseInt(localStorage.getItem("contador")) || 0;
+    codigoValido = localStorage.getItem("codigo") || "";
+    codigoExpira = parseInt(localStorage.getItem("expira")) || 0;
+    vipUser = localStorage.getItem("vipUser") || "";
+    vipPass = localStorage.getItem("vipPass") || "";
+    promoExpira = parseInt(localStorage.getItem("promoExpira")) || 0;
+
+    document.getElementById("limite").innerText = limiteGratis;
+}
+function salvarDados(){
+    localStorage.setItem("limite", limiteGratis);
+    localStorage.setItem("contador", contadorSensi);
+    localStorage.setItem("codigo", codigoValido);
+    localStorage.setItem("expira", codigoExpira);
+    localStorage.setItem("vipUser", vipUser);
+    localStorage.setItem("vipPass", vipPass);
+    localStorage.setItem("promoExpira", promoExpira);
+}
+carregarDados();
+
+// Detectar sistema
+let sistema = "Desconhecido";
+if(navigator.userAgent.includes("Android")) sistema="Android";
+if(navigator.userAgent.includes("iPhone")) sistema="iOS";
+
+// ===== GERAR SENSI =====
+function gerarGratis(){
+    if(limiteGratis <= 0){
+        alert("Limite atingido!");
+        return;
+    }
+
+    limiteGratis--;
+    contadorSensi++;
+    salvarDados();
+    document.getElementById("limite").innerText = limiteGratis;
+
+    let geral = Math.floor(Math.random()*50)+150;
+    let redDot = Math.floor(Math.random()*50)+150;
+    let doisX = Math.floor(Math.random()*50)+150;
+    let quatroX = Math.floor(Math.random()*50)+150;
+    let awm = Math.floor(Math.random()*50)+150;
+
+    document.getElementById("resultado").innerHTML =
+    "Sistema: "+sistema+"<br>"+
+    "Geral: "+geral+"<br>"+
+    "Red Dot: "+redDot+"<br>"+
+    "2x: "+doisX+"<br>"+
+    "4x: "+quatroX+"<br>"+
+    "AWM: "+awm+"<br>"+
+    "Sensis geradas: "+contadorSensi;
+
+    confete();
+}
+
+// Confete
+function confete(){
+    for(let i=0;i<12;i++){
+        let span=document.createElement("span");
+        span.innerHTML="🎉";
+        span.style.position="fixed";
+        span.style.left=Math.random()*100+"%";
+        span.style.top="0px";
+        document.body.appendChild(span);
+
+        let queda=setInterval(()=>{
+            span.style.top=(span.offsetTop+5)+"px";
+            if(span.offsetTop>500){
+                clearInterval(queda);
+                span.remove();
+            }
+        },30);
+    }
+}
+
+// ===== CÓDIGO +20 =====
+function usarCodigoExtra(){
+    let cod = document.getElementById("codigoExtra").value;
+
+    if(cod === codigoValido && Date.now() < codigoExpira){
+        limiteGratis += 20;
+        salvarDados();
+        document.getElementById("limite").innerText = limiteGratis;
+        alert("🔥 +20 Sensis liberadas!");
+    }else{
+        alert("Código inválido ou expirado!");
+    }
+}
+
+// ===== VIP =====
+function loginVIP(){
+    let user = document.getElementById("loginVip").value;
+    let pass = document.getElementById("senhaVip").value;
+
+    if(user === vipUser && pass === vipPass){
+        liberarVIP();
+    }
+    else if(pass === PROMO_CODIGO){
+        promoExpira = Date.now() + 86400000;
+        salvarDados();
+        alert("🔥 VIP ativado por 24 horas!");
+        liberarVIP();
+    }
+    else if(Date.now() < promoExpira){
+        liberarVIP();
+    }
+    else{
+        alert("Login VIP incorreto");
+    }
+}
+
+function liberarVIP(){
+    document.getElementById("vipResultado").innerHTML =
+    "IA analisou seu celular:<br>"+
+    "FPS estimado: "+(Math.floor(Math.random()*30)+60)+"<br>"+
+    "Nota desempenho: "+(Math.random()*2+8).toFixed(1)+"/10";
+}
+
+// ===== ADMIN =====
+function loginAdmin(){
+    let senha=document.getElementById("senhaAdmin").value;
+
+    if(senha === ADMIN_SENHA){
+        document.getElementById("adminArea").style.display="block";
+    }else{
+        alert("Senha Admin incorreta");
+    }
+}
+
+function gerarCodigo(){
+    codigoValido="EXTRA"+Math.floor(Math.random()*9999);
+    codigoExpira=Date.now()+86400000;
+    salvarDados();
+    document.getElementById("codigoGerado").innerText=
+    "Código: "+codigoValido+" (24h válido)";
+}
+
+function gerarVip(){
+    vipUser="vip"+Math.floor(Math.random()*999);
+    vipPass="VIP"+Math.floor(Math.random()*9999);
+    salvarDados();
+
+    document.getElementById("vipGerado").innerHTML=
+    "Usuário: "+vipUser+"<br>Senha: "+vipPass;
+}
+
+// ===== ADMIN SECRETO (7 TOQUES) =====
+let toqueCount = 0;
+
+document.getElementById("titulo").addEventListener("click", () => {
+    toqueCount++;
+
+    if(toqueCount === 7){
+        document.getElementById("adminPanel").style.display="block";
+        toqueCount = 0;
+    }
+
+    setTimeout(()=>{
+        toqueCount = 0;
+    },3000);
+});
+
+</script>
+</body>
+  </html>
